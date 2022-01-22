@@ -1,45 +1,108 @@
 <template>
-  <h1>Chess Clock</h1>
-  <p>{{rendered}}</p>
-  <button @click="start">Start</button>
-  <button @click="stop">Stop</button>
-  <button @click="reset">Reset</button>
+  <div id="clock">
+    <div id="wrapper">
+      <span class="time">{{ rendered }}</span>
+
+      <div class="btn-container">
+        <a id="start" @click="start">Start</a>
+        <a id="stop" @click="stop">Stop</a>
+        <a id="reset" @click="reset">Reset</a>
+      </div>
+    </div>
+
+    <div class="text">
+      <a href="https://codepen.io/raphael_octau" target="_blank">@raphael_octau</a>
+    </div>
+  </div>
 
 </template>
 
 <script setup lang="ts">
 import { ref, defineComponent, computed } from 'vue'
+import { Stopwatch } from "ts-stopwatch";
+import { renderMillis } from "./use-render";
 
-// Thanks to RobG https://stackoverflow.com/questions/9763441/milliseconds-to-time-in-javascript/9763479
-const renderMillis = (s: int) =>  {
-  var ms = s % 1000;
-  s = (s - ms) / 1000;
-  var secs = s % 60;
-  s = (s - secs) / 60;
-  var mins = s % 60;
-  var hrs = (s - mins) / 60;
+const sw = new Stopwatch()
 
-  return hrs + ':' + mins + ':' + secs + '.' + ms;
-}
+const time = ref(0)
+const rendered = computed(() => renderMillis(time.value))
 
-const rendered = computed(() => renderMillis(0))
-  
+setInterval(() => time.value = sw.getTime(), 10)
+
+const start = () => sw.start()
+const stop = () => sw.stop()
+const reset = () => sw.reset()
 </script>
 
 <style scoped>
-a {
-  color: #42b983;
+@import url("https://fonts.googleapis.com/css?family=Share+Tech+Mono");
+
+@font-face {
+  font-family: "Share Tech Mono";
+  src: url("https://fonts.googleapis.com/css?family=Share+Tech+Mono");
 }
 
-label {
-  margin: 0 0.5em;
-  font-weight: bold;
+
+#clock, html, body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 1000px;
 }
 
-code {
-  background-color: #eee;
-  padding: 2px 4px;
-  border-radius: 4px;
-  color: #304455;
+#clock, body {
+  background-color: #0a0a0a;
+  font-family: "Share Tech Mono", sans-serif;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-content: stretch;
+  align-items: center;
+}
+
+#clock {
+  order: 0;
+  flex: 0 1 auto;
+  align-self: center;
+  color: #c8c8c8;
+}
+#clock .time {
+  font-size: 6.5em;
+}
+#clock .text {
+  margin-top: 30px;
+  font-size: 1em;
+  color: rgba(200, 200, 200, 0.15);
+  text-align: center;
+}
+#clock .text a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.1s ease-out;
+}
+#clock .text a:hover {
+  color: #c8c8c8;
+}
+#clock .btn-container {
+  display: flex;
+  margin-top: 15px;
+}
+#clock .btn-container a {
+  text-align: center;
+  font-family: "Share Tech Mono", sans-serif;
+  background: transparent;
+  border: none;
+  color: #c8c8c8;
+  padding: 10px 15px;
+  margin: 0 10px;
+  text-transform: uppercase;
+  font-size: 2em;
+  cursor: pointer;
+  flex-grow: 1;
+  transition: color 0.1s ease-out;
+}
+#clock .btn-container a:hover {
+  color: white;
 }
 </style>
