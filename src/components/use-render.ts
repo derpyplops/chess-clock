@@ -1,5 +1,5 @@
 // Thanks to RobG https://stackoverflow.com/questions/9763441/milliseconds-to-time-in-javascript/9763479
-const renderNum = (n, len) => {
+const renderNum = (n: number, len: number) => {
     let str = n.toString()
     while (str.length < len) {
         str = '0' + str

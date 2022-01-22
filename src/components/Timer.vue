@@ -9,12 +9,14 @@
         <a id="reset" @click="reset">Reset</a>
         <a id="makeCall" @click="makeCall">Call</a>
         <a id="answer" @click="makeAnswer">Answer</a>
+        <a id="Start Other" @click="startOther">Start Other</a>
+        <a id="Stop Other" @click="stopOther">Stop Other</a>
       </div>
       <input v-model="callId"/>
     </div>
 
     <div class="text">
-      <a href="https://codepen.io/raphael_octau" target="_blank">@raphael_octau</a>
+      <a href="jnhl.dev" target="_blank">@jnhl</a>
     </div>
   </div>
 
@@ -24,12 +26,12 @@
 import { ref, defineComponent, computed } from 'vue'
 import { Stopwatch } from "ts-stopwatch";
 import { renderMillis } from "./use-render";
-import {useFirebase} from "./use-firebase";
-
-
-const { makeCall, makeAnswer, callId } = useFirebase()
+import { useFirebase } from "./use-firebase";
 
 const sw = new Stopwatch()
+const { makeCall, makeAnswer, callId, startOther, stopOther } = useFirebase(sw)
+
+
 
 const time = ref(0)
 const rendered = computed(() => renderMillis(time.value))

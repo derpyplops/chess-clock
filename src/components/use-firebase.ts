@@ -3,9 +3,10 @@ import firebase from 'firebase/app';
 import 'firebase/firestore';
 import { getFirestore, collection, addDoc, setDoc, getDoc, doc, onSnapshot, updateDoc } from "firebase/firestore";
 import {ref} from "vue";
+import {Stopwatch} from "ts-stopwatch";
 
 
-export const useFirebase = () => {
+export const useFirebase = (sw: Stopwatch) => {
     // Import the functions you need from the SDKs you need
 
     // TODO: Add SDKs for Firebase products that you want to use
@@ -43,10 +44,18 @@ export const useFirebase = () => {
 
     const receiveChannelCallback = (event: RTCDataChannelEvent) => {
         receiveChannel = event.channel;
-        receiveChannel.onmessage = event => console.log('recieved over channel', event)
+        receiveChannel.onmessage = event => handleReceive(event)
         receiveChannel.onopen = ()=>console.log('recieved open', event);
         receiveChannel.onclose = ()=>console.log('recieved closed', event);
+    }
 
+    const handleReceive = (event: MessageEvent) => {
+        console.log('recieved over channel', event)
+        if (event.data === 'start') {
+            sw.start()
+        } else if (event.data === 'stop') {
+            sw.stop()
+        }
     }
     pc.ondatachannel = receiveChannelCallback;
 
@@ -57,16 +66,15 @@ export const useFirebase = () => {
 
     sendChannel.onopen = () => {
         console.log('Connected!')
-        sendHello(sendChannel)
     }
 
-    const sendHello = (dataChannel: RTCDataChannel) => {
-        console.log('sendingping')
-        setInterval(()=> {
-            console.log('sendingping')
-            dataChannel.send("ping!")
-        }, 1000)
-    }
+    const startOther = () => {
+        sendChannel.send('start')
+    } // takes function that starts
+
+    const stopOther = () => {
+        sendChannel.send('stop')
+    } // takes function that starts
 
     const makeCall = async () => {
         console.log('calling...')
@@ -158,7 +166,9 @@ export const useFirebase = () => {
     return {
         makeCall,
         makeAnswer,
-        callId
+        callId,
+        startOther,
+        stopOther
     }
 
 }
