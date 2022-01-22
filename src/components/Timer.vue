@@ -7,7 +7,10 @@
         <a id="start" @click="start">Start</a>
         <a id="stop" @click="stop">Stop</a>
         <a id="reset" @click="reset">Reset</a>
+        <a id="makeCall" @click="makeCall">Call</a>
+        <a id="answer" @click="makeAnswer">Answer</a>
       </div>
+      <input v-model="callId"/>
     </div>
 
     <div class="text">
@@ -21,6 +24,10 @@
 import { ref, defineComponent, computed } from 'vue'
 import { Stopwatch } from "ts-stopwatch";
 import { renderMillis } from "./use-render";
+import {useFirebase} from "./use-firebase";
+
+
+const { makeCall, makeAnswer, callId } = useFirebase()
 
 const sw = new Stopwatch()
 
