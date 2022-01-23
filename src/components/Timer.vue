@@ -1,16 +1,20 @@
 <template>
   <div id="clock">
     <div id="wrapper">
-      <span class="time">{{ rendered }}</span>
-
+      <div class="pair">
+        <div class="player">Player 1</div>
+        <div class="time">{{ renderedTimes[0].value }}</div>
+      </div>
+      <div class="pair">
+        <div class="player">Player 2</div>
+        <div class="time">{{ renderedTimes[1].value }}</div>
+      </div>
       <div class="btn-container">
-        <a id="start" @click="start">Start</a>
-        <a id="stop" @click="stop">Stop</a>
-        <a id="reset" @click="reset">Reset</a>
-        <a id="makeCall" @click="makeCall">Call</a>
-        <a id="answer" @click="makeAnswer">Answer</a>
-        <a id="Start Other" @click="startOther">Start Other</a>
-        <a id="Stop Other" @click="stopOther">Stop Other</a>
+        <a id="start" @click="start(0)">Start</a>
+        <a id="stop" @click="stop(0)">Stop</a>
+<!--        <a id="reset" @click="reset">Reset</a>-->
+        <a id="makeCall" @click="handleCall">Call</a>
+        <a id="answer" @click="handleAnswer">Answer</a>
       </div>
       <input v-model="callId"/>
     </div>
@@ -23,24 +27,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineComponent, computed } from 'vue'
-import { Stopwatch } from "ts-stopwatch";
-import { renderMillis } from "./use-render";
-import { useFirebase } from "./use-firebase";
+import { ref } from 'vue'
+import {useTimers} from "./use-timers";
 
-const sw = new Stopwatch()
-const { makeCall, makeAnswer, callId, startOther, stopOther } = useFirebase(sw)
+const callId = ref('')
 
+const {
+  makeCall,
+  makeAnswer,
+  renderedTimes,
+  start,
+  stop,
+  play
+} = useTimers()
 
+const handleCall = async () => {
+  callId.value = await makeCall()
+}
+const handleAnswer = async () => {
+  await makeAnswer(callId.value)
+}
 
-const time = ref(0)
-const rendered = computed(() => renderMillis(time.value))
-
-setInterval(() => time.value = sw.getTime(), 10)
-
-const start = () => sw.start()
-const stop = () => sw.stop()
-const reset = () => sw.reset()
 </script>
 
 <style scoped>
@@ -113,5 +120,16 @@ const reset = () => sw.reset()
 }
 #clock .btn-container a:hover {
   color: white;
+}
+
+.pair {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.player {
+  font-size: 40px;
+  margin-right: 30px;
 }
 </style>

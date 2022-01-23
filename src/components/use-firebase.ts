@@ -5,12 +5,9 @@ import { getFirestore, collection, addDoc, setDoc, getDoc, doc, onSnapshot, upda
 import {ref} from "vue";
 import {Stopwatch} from "ts-stopwatch";
 import {firebaseConfig, servers} from "./config";
+import {Callback, Handler} from "../types/types";
 
-
-export const useFirebase = (sw: Stopwatch) => {
-
-    const callId = ref('')
-
+export const useFirebase = () => {
     const app = initializeApp(firebaseConfig);
     const store = getFirestore(app)
 
@@ -18,22 +15,32 @@ export const useFirebase = (sw: Stopwatch) => {
 
     let pc = new RTCPeerConnection(servers)
 
-    const receiveChannelCallback = (event: RTCDataChannelEvent) => {
+    const parseRawMsg: (msg: string) => [string, string[]] = (msg: string) => {
+        const [command, ...args] = msg.split(':')
+        return [command, args]
+    }
+
+    const makeHandler = (pairs: Callback[]) => { // todo think of a better name
+        return (event: MessageEvent) => {
+            console.log('recieved over channel', event)
+            pairs.forEach(pair => {
+                const [command, callback] = pair
+                const [msgCommand, args] = parseRawMsg(event.data)
+                if (msgCommand === command) callback(args)
+            })
+        }
+    }
+
+    const setHandler: (callbacks: Callback[]) => void = (pairs: [string, (args: string[]) => void][]) => {
+        pc.ondatachannel = receiveChannelCallback(makeHandler(pairs));
+    }
+
+    const receiveChannelCallback = (handleReceive: Handler) => (event: RTCDataChannelEvent) => {
         receiveChannel = event.channel;
         receiveChannel.onmessage = event => handleReceive(event)
         receiveChannel.onopen = ()=>console.log('recieved open', event);
         receiveChannel.onclose = ()=>console.log('recieved closed', event);
     }
-
-    const handleReceive = (event: MessageEvent) => {
-        console.log('recieved over channel', event)
-        if (event.data === 'start') {
-            sw.start()
-        } else if (event.data === 'stop') {
-            sw.stop()
-        }
-    }
-    pc.ondatachannel = receiveChannelCallback;
 
     let sendChannel = pc.createDataChannel('sendChannel')
 
@@ -41,22 +48,12 @@ export const useFirebase = (sw: Stopwatch) => {
         console.log('Connected!')
     }
 
-    const startOther = () => {
-        sendChannel.send('start')
-    } // takes function that starts
-
-    const stopOther = () => {
-        sendChannel.send('stop')
-    } // takes function that starts
-
     const makeCall = async () => {
         console.log('calling...')
         const callCollection = collection(store,'calls')
         const callDoc = await addDoc(callCollection, {hello: "hello"})
         const offers = collection(store, 'calls', callDoc.id, 'offers')
         const answers = collection(store, 'calls',  callDoc.id, 'answers')
-
-        callId.value = callDoc.id
 
         pc.onicecandidate = pc.onicecandidate = (event) => {
             console.log('ice candidate rcvd', event)
@@ -95,12 +92,12 @@ export const useFirebase = (sw: Stopwatch) => {
             })
         })
 
+        return callDoc.id
     }
 
-    const makeAnswer = async () => {
+    const makeAnswer = async (callId: string) => {
         console.log('answering...')
-        const id = callId.value
-        const callDoc = doc(store, 'calls', id)
+        const callDoc = doc(store, 'calls', callId)
         const offers = collection(store, 'calls', callDoc.id, 'offers')
         const answers = collection(store, 'calls',  callDoc.id, 'answers')
 
@@ -135,13 +132,13 @@ export const useFirebase = (sw: Stopwatch) => {
         })
     }
 
+    const send = (msg: string) => sendChannel.send(msg)
 
     return {
         makeCall,
         makeAnswer,
-        callId,
-        startOther,
-        stopOther
+        send,
+        setHandler
     }
 
 }
