@@ -4,43 +4,19 @@ import 'firebase/firestore';
 import { getFirestore, collection, addDoc, setDoc, getDoc, doc, onSnapshot, updateDoc } from "firebase/firestore";
 import {ref} from "vue";
 import {Stopwatch} from "ts-stopwatch";
+import {firebaseConfig, servers} from "./config";
 
 
 export const useFirebase = (sw: Stopwatch) => {
-    // Import the functions you need from the SDKs you need
-
-    // TODO: Add SDKs for Firebase products that you want to use
-    // https://firebase.google.com/docs/web/setup#available-libraries
-
-    // Your web app's Firebase configuration
 
     const callId = ref('')
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyC30tFghLi33sHfOR5TmyKhUs5OpXf2a-0",
-        authDomain: "chess-clock-74319.firebaseapp.com",
-        projectId: "chess-clock-74319",
-        storageBucket: "chess-clock-74319.appspot.com",
-        messagingSenderId: "699302589921",
-        appId: "1:699302589921:web:107b8c0349bcc3d7124ea0"
-    };
-
-
-    const servers = {
-        iceServers: [
-            {
-                urls: ['stun:stun1.l.google.com:19302', 'stun:stun2.l.google.com:19302'],
-            },
-        ],
-        iceCandidatePoolSize: 10,
-    };
     const app = initializeApp(firebaseConfig);
     const store = getFirestore(app)
 
     let receiveChannel = null
 
     let pc = new RTCPeerConnection(servers)
-
 
     const receiveChannelCallback = (event: RTCDataChannelEvent) => {
         receiveChannel = event.channel;
@@ -58,9 +34,6 @@ export const useFirebase = (sw: Stopwatch) => {
         }
     }
     pc.ondatachannel = receiveChannelCallback;
-
-    let localStream = null;
-    let remoteStream = null;
 
     let sendChannel = pc.createDataChannel('sendChannel')
 
