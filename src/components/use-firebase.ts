@@ -15,6 +15,8 @@ export const useFirebase = () => {
 
     let pc = new RTCPeerConnection(servers)
 
+    let isConnected = ref(false)
+
     const parseRawMsg: (msg: string) => [string, string[]] = (msg: string) => {
         const [command, ...args] = msg.split(':')
         return [command, args]
@@ -46,6 +48,7 @@ export const useFirebase = () => {
 
     sendChannel.onopen = () => {
         console.log('Connected!')
+        isConnected.value = true
     }
 
     const makeCall = async () => {
@@ -138,7 +141,8 @@ export const useFirebase = () => {
         makeCall,
         makeAnswer,
         send,
-        setHandler
+        setHandler,
+        isConnected
     }
 
 }

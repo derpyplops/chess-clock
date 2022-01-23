@@ -1,7 +1,6 @@
 
 import {computed, ref, Ref} from "vue";
 import {Stopwatch} from "ts-stopwatch";
-import {firebaseConfig, servers} from "./config";
 import {useFirebase} from "./use-firebase";
 import {renderMillis} from "./use-render";
 import {Callback} from "../types/types";
@@ -20,6 +19,7 @@ export const useTimers = () => {
     const {
         makeCall,
         makeAnswer,
+        isConnected,
         send,
         setHandler
     } = useFirebase()
@@ -37,27 +37,33 @@ export const useTimers = () => {
     const startHandler: Callback = ['start', (args: string[]) => {
         const playerId = parseInt(args[0])
         timers[playerId].start()
+        running.value = playerId
     }]
 
-    const stop = (timerId: number) => {
-        if (!timerId || timerId > 1) {
-            console.warn(`Invalid timerId: ${timerId}`)
+    const stop = () => {
+        if (running.value === undefined) {
+            console.warn('Already stopped')
+            return
         }
-        const timer = timers[timerId]
-        timer.stop()
-        running.value = timerId
-        send(`stop:${timerId}`)
+        const runningTimer = timers[running.value]
+        runningTimer.stop()
+        running.value = undefined
+        send(`stop`)
     }
 
     const stopHandler: Callback = ['stop', (args: string[]) => {
-        const playerId = parseInt(args[0])
-        timers[playerId].stop()
+        if (running.value === undefined) {
+            console.warn('Already stopped')
+            return
+        }
+        const runningTimer = timers[running.value]
+        runningTimer.stop()
+        running.value = undefined
     }]
 
     const play = () => {
         if (running.value === undefined) {
             console.warn(`Not running`)
-            running.value
             return
         }
         const runningTimer = timers[running.value]
@@ -66,18 +72,42 @@ export const useTimers = () => {
         runningTimer.stop()
         other.start()
         running.value = otherId
-        // comm to other client
-        // handle comms
+        send(`play`)
     }
 
-    setHandler([startHandler, stopHandler])
+    const playHandler: Callback = ['play', (args: string[]) => {
+        if (running.value === undefined) {
+            console.warn(`Not running`)
+            return
+        }
+        const runningTimer = timers[running.value]
+        const otherId = running.value === 0 ? 1 : 0
+        const other = timers[otherId]
+        runningTimer.stop()
+        other.start()
+        running.value = otherId
+    }]
+
+    const reset = () => {
+        timers.forEach(timer => timer.reset())
+        running.value = undefined
+        send('reset')
+    }
+    const resetHandler: Callback = ['reset', (args: string[]) => {
+        timers.forEach(timer => timer.reset())
+        running.value = undefined
+    }] // todo reformat the rest to be like this
+
+    setHandler([startHandler, stopHandler, playHandler, resetHandler])
 
     return {
         makeCall,
         makeAnswer,
+        isConnected,
         renderedTimes,
         start,
         stop,
-        play
+        play,
+        reset
     }
 }

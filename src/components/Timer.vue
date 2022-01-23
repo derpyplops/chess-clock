@@ -9,18 +9,21 @@
         <div class="player">Player 2</div>
         <div class="time">{{ renderedTimes[1].value }}</div>
       </div>
-      <div class="btn-container">
+      <div class="btn-container" v-if="isConnected">
         <a id="start" @click="start(0)">Start</a>
-        <a id="stop" @click="stop(0)">Stop</a>
-<!--        <a id="reset" @click="reset">Reset</a>-->
+        <a id="stop" @click="stop">Stop</a>
+        <a id="play" @click="play">Switch</a>
+        <a id="reset" @click="reset">Reset</a>
+      </div>
+      <div class="btn-container" v-else>
         <a id="makeCall" @click="handleCall">Call</a>
         <a id="answer" @click="handleAnswer">Answer</a>
       </div>
-      <input v-model="callId"/>
+      <input v-if="!isConnected" v-model="callId"/>
     </div>
 
     <div class="text">
-      <a href="jnhl.dev" target="_blank">@jnhl</a>
+      <a href="https://jnhl.dev" target="_blank">@jnhl</a>
     </div>
   </div>
 
@@ -30,19 +33,27 @@
 import { ref } from 'vue'
 import {useTimers} from "./use-timers";
 
-const callId = ref('')
-
 const {
   makeCall,
   makeAnswer,
   renderedTimes,
+  isConnected,
   start,
   stop,
-  play
+  play,
+  reset
 } = useTimers()
 
+const callId = ref('')
+
+const callIdFromPath = window.location.pathname.slice(1)
+if (callIdFromPath) {
+  makeAnswer(callIdFromPath)
+}
+
+
 const handleCall = async () => {
-  callId.value = await makeCall()
+  callId.value = `${window.location.href}${await makeCall()}`
 }
 const handleAnswer = async () => {
   await makeAnswer(callId.value)
