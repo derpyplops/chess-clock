@@ -4,7 +4,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "vue-tsc --noEmit && vite build && surge ~/chess-clock/dist goose-clock.surge.sh"
   },
   "dependencies": {
     "firebase": "^9.6.4",

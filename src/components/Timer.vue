@@ -21,7 +21,7 @@
         <a id="makeCall" @click="handleCall">Call</a>
 <!--        <a id="answer" @click="handleAnswer">Answer</a>-->
       </div>
-      <input v-if="!isConnected" v-model="callId"/>
+      <input v-if="!isConnected" v-model="callId" readonly/>
     </div>
 
     <div class="me">
