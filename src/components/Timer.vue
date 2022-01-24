@@ -1,13 +1,15 @@
 <template>
   <div id="clock">
     <div id="wrapper">
-      <div class="pair">
-        <div class="player">Player 1</div>
-        <div class="time">{{ renderedTimes[0].value }}</div>
-      </div>
-      <div class="pair">
-        <div class="player">Player 2</div>
-        <div class="time">{{ renderedTimes[1].value }}</div>
+      <div class="timers" v-if="isConnected">
+        <div class="pair">
+          <div class="player">Player 1</div>
+          <div class="time">{{ renderedTimes[0].value }}</div>
+        </div>
+        <div class="pair">
+          <div class="player">Player 2</div>
+          <div class="time">{{ renderedTimes[1].value }}</div>
+        </div>
       </div>
       <div class="btn-container" v-if="isConnected">
         <a id="start" @click="start(0)">Start</a>
@@ -17,12 +19,12 @@
       </div>
       <div class="btn-container" v-else>
         <a id="makeCall" @click="handleCall">Call</a>
-        <a id="answer" @click="handleAnswer">Answer</a>
+<!--        <a id="answer" @click="handleAnswer">Answer</a>-->
       </div>
       <input v-if="!isConnected" v-model="callId"/>
     </div>
 
-    <div class="text">
+    <div class="me">
       <a href="https://jnhl.dev" target="_blank">@jnhl</a>
     </div>
   </div>
@@ -44,16 +46,18 @@ const {
   reset
 } = useTimers()
 
+const params = new URLSearchParams(window.location.search)
+
 const callId = ref('')
 
-const callIdFromPath = window.location.pathname.slice(1)
-if (callIdFromPath) {
-  makeAnswer(callIdFromPath)
+const callIdFromParams = params.get('call')
+if (callIdFromParams) {
+  makeAnswer(callIdFromParams)
 }
 
 
 const handleCall = async () => {
-  callId.value = `${window.location.href}${await makeCall()}`
+  callId.value = `${window.location.href}?call=${await makeCall()}`
 }
 const handleAnswer = async () => {
   await makeAnswer(callId.value)
@@ -97,7 +101,7 @@ const handleAnswer = async () => {
 #clock .time {
   font-size: 6.5em;
 }
-#clock .text {
+#clock .me {
   margin-top: 30px;
   font-size: 1em;
   color: rgba(200, 200, 200, 0.15);
@@ -114,6 +118,7 @@ const handleAnswer = async () => {
 #clock .btn-container {
   display: flex;
   margin-top: 15px;
+  margin-bottom: 15px;
 }
 #clock .btn-container a {
   text-align: center;
