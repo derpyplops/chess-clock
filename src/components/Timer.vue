@@ -85,7 +85,7 @@ const handleAnswer = async () => {
   background-color: #0a0a0a;
   font-family: "Share Tech Mono", sans-serif;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: nowrap;
   justify-content: center;
   align-content: stretch;
