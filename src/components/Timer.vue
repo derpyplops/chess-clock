@@ -1,7 +1,7 @@
 <template>
   <div id="clock">
     <div id="wrapper">
-      <div class="timers" v-if="isConnected">
+      <div class="timers" v-if="isConnected || devMode">
         <div class="pair">
           <div class="player">Player 1</div>
           <div class="time">{{ renderedTimes[0].value }}</div>
@@ -11,7 +11,7 @@
           <div class="time">{{ renderedTimes[1].value }}</div>
         </div>
       </div>
-      <div class="btn-container" v-if="isConnected">
+      <div class="btn-container" v-if="isConnected || devMode">
         <a id="start" @click="start(0)">Start</a>
         <a id="stop" @click="stop">Stop</a>
         <a id="play" @click="play">Switch</a>
@@ -63,6 +63,8 @@ const handleAnswer = async () => {
   await makeAnswer(callId.value)
 }
 
+const devMode = import.meta.env.DEV
+
 </script>
 
 <style scoped>
@@ -78,7 +80,8 @@ const handleAnswer = async () => {
   padding: 0;
   margin: 0;
   width: 100%;
-  height: 1000px;
+  height: 100%;
+  min-height: 100%;
 }
 
 #clock, body {
