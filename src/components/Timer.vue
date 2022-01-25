@@ -75,17 +75,21 @@ const devMode = import.meta.env.DEV
   src: url("https://fonts.googleapis.com/css?family=Share+Tech+Mono");
 }
 
+@media (orientation: landscape) {
+  .player {
+    font-size: 2em !important;
+  }
+  .time {
+    font-size: 3em !important;
+  }
+}
 
 #clock, html, body {
   padding: 0;
   margin: 0;
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
 }
 
 #clock, body {
-  background-color: #0a0a0a;
   font-family: "Share Tech Mono", sans-serif;
   display: flex;
   flex-direction: column;
@@ -101,16 +105,16 @@ const devMode = import.meta.env.DEV
   align-self: center;
   color: #c8c8c8;
 }
-#clock .time {
+.time {
   font-size: 6.5em;
 }
-#clock .me {
+.me {
   margin-top: 30px;
   font-size: 1em;
   color: rgba(200, 200, 200, 0.15);
   text-align: center;
 }
-#clock .text a {
+.text a {
   text-decoration: none;
   color: inherit;
   transition: color 0.1s ease-out;
@@ -118,12 +122,12 @@ const devMode = import.meta.env.DEV
 #clock .text a:hover {
   color: #c8c8c8;
 }
-#clock .btn-container {
+.btn-container {
   display: flex;
   margin-top: 15px;
   margin-bottom: 15px;
 }
-#clock .btn-container a {
+.btn-container a {
   text-align: center;
   font-family: "Share Tech Mono", sans-serif;
   background: transparent;
@@ -137,7 +141,7 @@ const devMode = import.meta.env.DEV
   flex-grow: 1;
   transition: color 0.1s ease-out;
 }
-#clock .btn-container a:hover {
+.btn-container a:hover {
   color: white;
 }
 
