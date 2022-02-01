@@ -1,7 +1,7 @@
 import { computed, ref, Ref } from 'vue'
 import { Stopwatch } from 'ts-stopwatch'
 import { useFirebase } from './use-firebase'
-import { renderMillis } from './use-render'
+import { render } from './use-render'
 import { Callback } from '../types/types'
 
 export const useTimers = () => {
@@ -12,7 +12,9 @@ export const useTimers = () => {
 		rawTimes[0].value = timers[0].getTime()
 		rawTimes[1].value = timers[1].getTime()
 	}, 10)
-	const renderedTimes = rawTimes.map(timeRef => computed(()=> renderMillis(timeRef.value)))
+	const renderedTimes = rawTimes.map(timeRef => computed(()=> render(timeRef.value)))
+
+	const pausedTimer: Ref<number|undefined> = ref(undefined)
 
 	const running: Ref<number|undefined> = ref(undefined)
 	const {
@@ -23,7 +25,8 @@ export const useTimers = () => {
 		setHandler
 	} = useFirebase()
 
-	const start = (timerId: number) => {
+	const start = (selected?: number) => {
+		const timerId = selected || pausedTimer.value || 0
 		if (!timerId || timerId > 1) {
 			console.warn(`Invalid timerId: ${timerId}`)
 		} // todo extract invalid timerid exception
@@ -46,6 +49,7 @@ export const useTimers = () => {
 		}
 		const runningTimer = timers[running.value]
 		runningTimer.stop()
+		pausedTimer.value = running.value
 		running.value = undefined
 		send('stop')
 	}
@@ -107,6 +111,7 @@ export const useTimers = () => {
 		start,
 		stop,
 		play,
-		reset
+		reset,
+		running
 	}
 }

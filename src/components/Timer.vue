@@ -5,7 +5,10 @@
         v-if="isConnected || devMode"
         class="timers"
       >
-        <div class="pair">
+        <div
+          class="pair"
+          @click="start(0)"
+        >
           <div class="player">
             Player 1
           </div>
@@ -13,7 +16,10 @@
             {{ renderedTimes[0].value }}
           </div>
         </div>
-        <div class="pair">
+        <div
+          class="pair"
+          @click="start(1)"
+        >
           <div class="player">
             Player 2
           </div>
@@ -26,22 +32,43 @@
         v-if="isConnected || devMode"
         class="btn-container"
       >
-        <a
-          id="start"
-          @click="start(0)"
-        >Start</a>
-        <a
-          id="stop"
-          @click="stop"
-        >Stop</a>
-        <a
-          id="play"
+        <svg
+          v-if="running === undefined"
+          class="icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="30"
+          height="30"
+          @click="start()"
+        >
+          <path
+            d="M20.494,7.968l-9.54-7A5,5,0,0,0,3,5V19a5,5,0,0,0,7.957,4.031l9.54-7a5,5,0,0,0,0-8.064Zm-1.184,6.45-9.54,7A3,3,0,0,1,5,19V5A2.948,2.948,0,0,1,6.641,2.328,3.018,3.018,0,0,1,8.006,2a2.97,2.97,0,0,1,1.764.589l9.54,7a3,3,0,0,1,0,4.836Z"
+          /></svg>
+        <svg
+          v-else
+          class="icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="30"
+          height="30"
           @click="play"
-        >Switch</a>
-        <a
-          id="reset"
+        ><path d="M23.421,16.583,20.13,13.292a1,1,0,1,0-1.413,1.414L21.007,17A9.332,9.332,0,0,1,14.321,14.2a.982.982,0,0,0-1.408.08L12.9,14.3a1,1,0,0,0,.075,1.382A11.177,11.177,0,0,0,21.01,19l-2.293,2.293A1,1,0,1,0,20.13,22.7l3.291-3.291A2,2,0,0,0,23.421,16.583Z" /><path d="M21.007,7l-2.29,2.29a.892.892,0,0,0-.054.082.992.992,0,0,0,1.467,1.332L21.836,9l1.586-1.585a2,2,0,0,0,.457-2.1,1.969,1.969,0,0,0-.458-.728L20.13,1.3a1,1,0,1,0-1.413,1.413L21.01,5.005c-4.933.012-7.637,2.674-10.089,5.474C8.669,7.937,6,5.4,1.487,5.046L1.006,5a1,1,0,0,0-1,1,1.02,1.02,0,0,0,1,1c.072,0,.287.033.287.033C5.189,7.328,7.425,9.522,9.6,12c-2.162,2.466-4.383,4.7-8.247,4.96l-.4.021a.994.994,0,1,0,.124,1.985c.156-.007.41-.013.535-.023,5.02-.387,7.743-3.6,10.171-6.409C14.235,9.7,16.551,7.018,21.007,7Z" /></svg>
+        <svg
+          class="icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="30"
+          height="30"
+          @click="stop"
+        ><path d="M19,0H5A5.006,5.006,0,0,0,0,5V19a5.006,5.006,0,0,0,5,5H19a5.006,5.006,0,0,0,5-5V5A5.006,5.006,0,0,0,19,0Zm3,19a3,3,0,0,1-3,3H5a3,3,0,0,1-3-3V5A3,3,0,0,1,5,2H19a3,3,0,0,1,3,3Z" /></svg>
+        <svg
+          class="icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="30"
+          height="30"
           @click="reset"
-        >Reset</a>
+        ><path d="M10.42,20.656a3.77,3.77,0,0,1-2.233-.735l-6.641-4.87a3.784,3.784,0,0,1,0-6.1l6.641-4.87A3.783,3.783,0,0,1,14.2,6.853l3.782-2.774A3.784,3.784,0,0,1,24,7.13v9.74a3.784,3.784,0,0,1-6.021,3.051L14.2,17.147a3.79,3.79,0,0,1-3.777,3.509Zm2.787-6.475a1,1,0,0,1,.592.194l5.363,3.933A1.784,1.784,0,0,0,22,16.87V7.13a1.785,1.785,0,0,0-2.839-1.438L13.8,9.625a1,1,0,0,1-1.592-.806V7.13A1.784,1.784,0,0,0,9.369,5.692l-6.64,4.87a1.783,1.783,0,0,0,0,2.876l6.64,4.87a1.784,1.784,0,0,0,2.838-1.438V15.181a1,1,0,0,1,1-1Z" /></svg>
       </div>
       <div
         v-else
@@ -81,7 +108,8 @@ const {
   start,
   stop,
   play,
-  reset
+  reset,
+    running
 } = useTimers()
 
 const params = new URLSearchParams(window.location.search)
@@ -161,6 +189,7 @@ const devMode = import.meta.env.DEV
   display: flex;
   margin-top: 15px;
   margin-bottom: 15px;
+  justify-content: space-between;
 }
 .btn-container a {
   text-align: center;
@@ -189,5 +218,9 @@ const devMode = import.meta.env.DEV
 .player {
   font-size: 40px;
   margin-right: 30px;
+}
+
+.icon {
+  filter: invert(96%) sepia(0%) saturate(117%) hue-rotate(186deg) brightness(82%) contrast(94%);
 }
 </style>

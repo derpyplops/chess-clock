@@ -4,10 +4,14 @@ const renderNum = (n: number, len: number) => {
 	while (str.length < len) {
 		str = '0' + str
 	}
-	return str
+	return `${str.substring(0,len)}`
 }
 
-export const renderMillis = (s: number) =>  {
+const renderMillis = (n: number) => {
+	return ~~(n/100)
+}
+
+export const render = (s: number) =>  {
 	const ms = s % 1000
 	s = (s - ms) / 1000
 	const secs = s % 60
@@ -15,5 +19,5 @@ export const renderMillis = (s: number) =>  {
 	const mins = s % 60
 	const hrs = (s - mins) / 60
 
-	return renderNum(hrs, 2) + ':' + renderNum(mins,2 ) + ':' + renderNum(secs,2) + '.' + renderNum(ms,3)
+	return renderNum(mins,2 ) + ':' + renderNum(secs,2) + '.' + renderMillis(ms)
 }
