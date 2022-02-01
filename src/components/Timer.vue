@@ -1,34 +1,72 @@
 <template>
   <div id="clock">
     <div id="wrapper">
-      <div class="timers" v-if="isConnected || devMode">
+      <div
+        v-if="isConnected || devMode"
+        class="timers"
+      >
         <div class="pair">
-          <div class="player">Player 1</div>
-          <div class="time">{{ renderedTimes[0].value }}</div>
+          <div class="player">
+            Player 1
+          </div>
+          <div class="time">
+            {{ renderedTimes[0].value }}
+          </div>
         </div>
         <div class="pair">
-          <div class="player">Player 2</div>
-          <div class="time">{{ renderedTimes[1].value }}</div>
+          <div class="player">
+            Player 2
+          </div>
+          <div class="time">
+            {{ renderedTimes[1].value }}
+          </div>
         </div>
       </div>
-      <div class="btn-container" v-if="isConnected || devMode">
-        <a id="start" @click="start(0)">Start</a>
-        <a id="stop" @click="stop">Stop</a>
-        <a id="play" @click="play">Switch</a>
-        <a id="reset" @click="reset">Reset</a>
+      <div
+        v-if="isConnected || devMode"
+        class="btn-container"
+      >
+        <a
+          id="start"
+          @click="start(0)"
+        >Start</a>
+        <a
+          id="stop"
+          @click="stop"
+        >Stop</a>
+        <a
+          id="play"
+          @click="play"
+        >Switch</a>
+        <a
+          id="reset"
+          @click="reset"
+        >Reset</a>
       </div>
-      <div class="btn-container" v-else>
-        <a id="makeCall" @click="handleCall">Call</a>
-<!--        <a id="answer" @click="handleAnswer">Answer</a>-->
+      <div
+        v-else
+        class="btn-container"
+      >
+        <a
+          id="makeCall"
+          @click="handleCall"
+        >Call</a>
+        <!--        <a id="answer" @click="handleAnswer">Answer</a>-->
       </div>
-      <input v-if="!isConnected" v-model="callId" readonly/>
+      <input
+        v-if="!isConnected"
+        v-model="callId"
+        readonly
+      >
     </div>
 
     <div class="me">
-      <a href="https://jnhl.dev" target="_blank">@jnhl</a>
+      <a
+        href="https://jnhl.dev"
+        target="_blank"
+      >@jnhl</a>
     </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -58,9 +96,6 @@ if (callIdFromParams) {
 
 const handleCall = async () => {
   callId.value = `${window.location.href}?call=${await makeCall()}`
-}
-const handleAnswer = async () => {
-  await makeAnswer(callId.value)
 }
 
 const devMode = import.meta.env.DEV

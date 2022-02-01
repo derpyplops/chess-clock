@@ -5,34 +5,19 @@ module.exports = {
 	},
 	'extends': [
 		'eslint:recommended',
-		'plugin:vue/essential',
-		'plugin:@typescript-eslint/recommended'
+		'plugin:vue/vue3-recommended',
+		"@vue/typescript/recommended"
 	],
+	'parser': 'vue-eslint-parser',
 	'parserOptions': {
-		'ecmaVersion': 'latest',
-		'parser': '@typescript-eslint/parser',
-		'sourceType': 'module'
+		'ecmaVersion': 12,
+		'parserOptions': {
+			'parser': '@typescript-eslint/parser',
+			'sourceType': 'module'
+		},
 	},
 	'plugins': [
 		'vue',
 		'@typescript-eslint'
-	],
-	'rules': {
-		'indent': [
-			'error',
-			'tab'
-		],
-		'linebreak-style': [
-			'error',
-			'unix'
-		],
-		'quotes': [
-			'error',
-			'single'
-		],
-		'semi': [
-			'error',
-			'never'
-		]
-	}
+	]
 }
