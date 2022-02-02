@@ -1,9 +1,18 @@
 <template>
-  <div id="clock">
+  <div
+    id="clock"
+  >
+    <img
+      v-fullscreen
+      src="../assets/icons/noun-fullscreen-1375381.svg"
+      alt="fullscreen"
+      class="icon fullscreen"
+    >
     <div id="wrapper">
       <div
         v-if="isConnected || devMode"
         class="timers"
+        @keyup.enter="start()"
       >
         <div
           class="pair"
@@ -39,6 +48,7 @@
           viewBox="0 0 24 24"
           width="30"
           height="30"
+          tabindex="1"
           @click="start()"
         >
           <path
@@ -99,6 +109,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {useTimers} from "./use-timers";
+import { useKeypress } from "vue3-keypress";
+
 
 const {
   makeCall,
@@ -111,6 +123,26 @@ const {
   reset,
     running
 } = useTimers()
+
+useKeypress({
+  keyEvent: "keydown",
+  keyBinds: [
+    {
+      keyCode: "space", // or keyCode as integer, e.g. 40
+      success: () => {
+        if (running.value === undefined) {
+          start(0)
+        } else {
+          play()
+        }
+      },
+    },
+    {
+      keyCode: "backspace",
+      success: stop
+    }
+  ]
+})
 
 const params = new URLSearchParams(window.location.search)
 
@@ -222,5 +254,11 @@ const devMode = import.meta.env.DEV
 
 .icon {
   filter: invert(96%) sepia(0%) saturate(117%) hue-rotate(186deg) brightness(82%) contrast(94%);
+}
+
+.fullscreen {
+  position: fixed;
+  top: 0;
+  right: 0
 }
 </style>

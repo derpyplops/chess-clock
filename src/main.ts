@@ -1,4 +1,10 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import VueFullscreen from "vue-fullscreen";
 
-createApp(App).mount('#app')
+const app = createApp(App)
+
+app.use(VueFullscreen)
+app.mount('#app')
+
+
